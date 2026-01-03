@@ -1,8 +1,3 @@
-// This is a secure backend API route that keeps your Gemini API key private
-// To use this, you need to:
-// 1. Set GEMINI_API_KEY in your Vercel environment variables
-// 2. Update the frontend code to call this API route instead of the Gemini API directly
-
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
