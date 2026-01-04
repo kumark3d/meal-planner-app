@@ -271,18 +271,7 @@ export default function MealPlanner() {
               </select>
             </div>
             
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                Email (for reminders)
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                placeholder="your@email.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
+
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -301,20 +290,6 @@ export default function MealPlanner() {
               )}
             </button>
             
-            <button
-              onClick={() => generateMealPlan(true)}
-              disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                'Generate and Send Reminders by Email'
-              )}
-            </button>
           </div>
         </div>
 
