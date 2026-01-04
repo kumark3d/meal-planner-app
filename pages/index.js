@@ -162,7 +162,7 @@ export default function MealPlanner() {
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <UtensilsCrossed className="w-8 h-8 text-green-600" />
-            <h1 className="text-3xl font-bold text-gray-800">AI Meal Planner</h1>
+            <h1 className="text-3xl font-bold text-gray-800">TEST TEST AI Meal Planner</h1>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
