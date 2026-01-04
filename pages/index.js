@@ -373,11 +373,12 @@ const exportToCalendar = () => {
           </div>
         </div>
 
-        {mealPlan && (
-          <>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Weekly Meal Plan</h2>
-              <div className="flex gap-3">
+       {mealPlan && (
+  <>
+    <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Your Weekly Meal Plan</h2>
+        <div className="flex gap-3">
           <button
             onClick={exportToText}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
@@ -392,84 +393,85 @@ const exportToCalendar = () => {
           </button>
         </div>
       </div>
-              <div className="space-y-6">
-                {mealPlan.days.map((day, idx) => (
-                  <div key={idx} className="border-l-4 border-green-500 pl-6 py-2">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">{day.day}</h3>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      {Object.entries(day.meals).map(([mealType, meal]) => (
-                        <div key={mealType} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-700 capitalize">{mealType}</h4>
-                            {meal.name.match(/(Chinese|Indian|Thai|Japanese|Korean|Mexican|Mediterranean|Middle Eastern|Vietnamese|Italian|French|Greek|Spanish|Turkish|Lebanese|Moroccan|Ethiopian)/i) && (
-                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
-                                {meal.name.match(/(Chinese|Indian|Thai|Japanese|Korean|Mexican|Mediterranean|Middle Eastern|Vietnamese|Italian|French|Greek|Spanish|Turkish|Lebanese|Moroccan|Ethiopian)/i)[0]}
-                              </span>
-                            )}
-                          </div>
-                          <p className="font-medium text-gray-900 mb-2">{meal.name}</p>
-                          <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
-                          
-                          <div className="flex items-center gap-2 mb-3 text-sm">
-                            <span className="bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
-                              ⏱️ {meal.prepTime} min
-                            </span>
-                          </div>
-                          
-                          {meal.recipeUrl && (
-                            <a
-                              href={meal.recipeUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm mb-3"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              View Recipe
-                            </a>
-                          )}
-                          
-                          <div className="text-xs text-gray-500 border-t border-gray-200 pt-2">
-                            <span className="font-semibold">Key ingredients:</span>
-                            <ul className="mt-1 ml-4 list-disc">
-                              {meal.ingredients.slice(0, 3).map((ing, i) => (
-                                <li key={i}>{ing}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+      
+      <div className="space-y-6">
+        {mealPlan.days.map((day, idx) => (
+          <div key={idx} className="border-l-4 border-green-500 pl-6 py-2">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">{day.day}</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {Object.entries(day.meals).map(([mealType, meal]) => (
+                <div key={mealType} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-gray-700 capitalize">{mealType}</h4>
+                    {meal.name.match(/(Chinese|Indian|Thai|Japanese|Korean|Mexican|Mediterranean|Middle Eastern|Vietnamese|Italian|French|Greek|Spanish|Turkish|Lebanese|Moroccan|Ethiopian)/i) && (
+                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                        {meal.name.match(/(Chinese|Indian|Thai|Japanese|Korean|Mexican|Mediterranean|Middle Eastern|Vietnamese|Italian|French|Greek|Spanish|Turkish|Lebanese|Moroccan|Ethiopian)/i)[0]}
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <ShoppingCart className="w-6 h-6 text-green-600" />
-                <h2 className="text-2xl font-bold text-gray-800">Shopping List</h2>
-              </div>
-              <div className="grid md:grid-cols-3 gap-6">
-                {Object.entries(mealPlan.groceryList).map(([category, items]) => (
-                  <div key={category}>
-                    <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-green-500">
-                      {category}
-                    </h3>
-                    <ul className="space-y-2">
-                      {items.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-green-600 mt-1">•</span>
-                          <span className="text-gray-700">{item}</span>
-                        </li>
+                  <p className="font-medium text-gray-900 mb-2">{meal.name}</p>
+                  <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
+                  
+                  <div className="flex items-center gap-2 mb-3 text-sm">
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
+                      ⏱️ {meal.prepTime} min
+                    </span>
+                  </div>
+                  
+                  {meal.recipeUrl && (
+                    
+                      href={meal.recipeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm mb-3"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View Recipe
+                    </a>
+                  )}
+                  
+                  <div className="text-xs text-gray-500 border-t border-gray-200 pt-2">
+                    <span className="font-semibold">Key ingredients:</span>
+                    <ul className="mt-1 ml-4 list-disc">
+                      {meal.ingredients.slice(0, 3).map((ing, i) => (
+                        <li key={i}>{ing}</li>
                       ))}
                     </ul>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          </>
-        )}
+          </div>
+        ))}
       </div>
+    </div>
+
+    <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="flex items-center gap-3 mb-6">
+        <ShoppingCart className="w-6 h-6 text-green-600" />
+        <h2 className="text-2xl font-bold text-gray-800">Shopping List</h2>
+      </div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {Object.entries(mealPlan.groceryList).map(([category, items]) => (
+          <div key={category}>
+            <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-green-500">
+              {category}
+            </h3>
+            <ul className="space-y-2">
+              {items.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="text-green-600 mt-1">•</span>
+                  <span className="text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </>
+)}
+  </div>
     </div>
   );
 }
