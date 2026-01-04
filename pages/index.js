@@ -158,6 +158,86 @@ export default function MealPlanner() {
     return emailText;
   };
 
+const exportToText = () => {
+  let textContent = `WEEKLY MEAL PLAN\nGenerated: ${new Date().toLocaleDateString()}\n\n`;
+  
+  mealPlan.days.forEach(day => {
+    textContent += `${day.day.toUpperCase()}\n${'='.repeat(day.day.length)}\n`;
+    Object.entries(day.meals).forEach(([mealType, meal]) => {
+      textContent += `\n${mealType.toUpperCase()}: ${meal.name}\n`;
+      textContent += `Description: ${meal.description}\n`;
+      textContent += `Prep time: ${meal.prepTime} minutes\n`;
+      if (meal.recipeUrl) {
+        textContent += `Recipe: ${meal.recipeUrl}\n`;
+      }
+      textContent += `Ingredients: ${meal.ingredients.join(', ')}\n`;
+    });
+    textContent += '\n';
+  });
+  
+  textContent += '\nSHOPPING LIST\n=============\n';
+  Object.entries(mealPlan.groceryList).forEach(([category, items]) => {
+    textContent += `\n${category.toUpperCase()}:\n`;
+    items.forEach(item => {
+      textContent += `  • ${item}\n`;
+    });
+  });
+  
+  // Create and download file
+  const blob = new Blob([textContent], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `meal-plan-${new Date().toISOString().split('T')[0]}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+};
+
+const exportToCalendar = () => {
+  let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Meal Planner//EN\n';
+  
+  const today = new Date();
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  
+  mealPlan.days.forEach((day, index) => {
+    const dayIndex = dayNames.indexOf(day.day);
+    const eventDate = new Date(today);
+    eventDate.setDate(today.getDate() + (dayIndex - today.getDay() + 7) % 7);
+    
+    Object.entries(day.meals).forEach(([mealType, meal]) => {
+      const startTime = mealType === 'breakfast' ? '08:00' : 
+                       mealType === 'lunch' ? '12:00' : '18:00';
+      const endTime = mealType === 'breakfast' ? '09:00' : 
+                     mealType === 'lunch' ? '13:00' : '19:00';
+      
+      const dateStr = eventDate.toISOString().split('T')[0].replace(/-/g, '');
+      const startStr = `${dateStr}T${startTime.replace(':', '')}00`;
+      const endStr = `${dateStr}T${endTime.replace(':', '')}00`;
+      
+      icsContent += `BEGIN:VEVENT\n`;
+      icsContent += `DTSTART:${startStr}\n`;
+      icsContent += `DTEND:${endStr}\n`;
+      icsContent += `SUMMARY:${mealType.charAt(0).toUpperCase() + mealType.slice(1)}: ${meal.name}\n`;
+      icsContent += `DESCRIPTION:Prep time: ${meal.prepTime} min\\n${meal.recipeUrl || ''}\n`;
+      icsContent += `END:VEVENT\n`;
+    });
+  });
+  
+  icsContent += 'END:VCALENDAR';
+  
+  // Create and download file
+  const blob = new Blob([icsContent], { type: 'text/calendar' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `meal-plan-${new Date().toISOString().split('T')[0]}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -297,6 +377,21 @@ export default function MealPlanner() {
           <>
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Weekly Meal Plan</h2>
+              <div className="flex gap-3">
+          <button
+            onClick={exportToText}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+          >
+            📄 Export to Notes
+          </button>
+          <button
+            onClick={exportToCalendar}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+          >
+            📅 Add to Calendar
+          </button>
+        </div>
+      </div>
               <div className="space-y-6">
                 {mealPlan.days.map((day, idx) => (
                   <div key={idx} className="border-l-4 border-green-500 pl-6 py-2">
