@@ -164,7 +164,7 @@ export default function MealPlanner() {
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <UtensilsCrossed className="w-8 h-8 text-green-600" />
-            <h1 className="text-3xl font-bold text-gray-800">TEST TEST AI Meal Planner</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Kumar's AI Meal Planner</h1>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -278,7 +278,7 @@ export default function MealPlanner() {
             <button
               onClick={() => generateMealPlan(false)}
               disabled={loading}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-12 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400"
             >
               {loading ? (
                 <>
