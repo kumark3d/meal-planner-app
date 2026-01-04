@@ -1,4 +1,4 @@
-// COMPLETE WORKING VERSION with Export Features
+// COMPLETE VERSION with Calorie Logic and Export Features
 import React, { useState } from 'react';
 import { Calendar, Users, ShoppingCart, Loader2, UtensilsCrossed, ExternalLink } from 'lucide-react';
 
@@ -14,6 +14,39 @@ export default function MealPlanner() {
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Calculate calorie needs based on age and family size
+  const calculateCalorieNeeds = () => {
+    const ages = formData.ages.split(',').map(age => parseInt(age.trim())).filter(age => !isNaN(age));
+    let totalCalories = 0;
+    let calorieBreakdown = [];
+    
+    ages.forEach(age => {
+      let dailyCalories;
+      if (age < 4) {
+        dailyCalories = 1200; // Toddlers
+      } else if (age < 9) {
+        dailyCalories = 1600; // Young children  
+      } else if (age < 14) {
+        dailyCalories = 2000; // Pre-teens
+      } else if (age < 19) {
+        dailyCalories = 2400; // Teenagers
+      } else if (age < 51) {
+        dailyCalories = 2200; // Adults
+      } else {
+        dailyCalories = 1800; // Seniors
+      }
+      
+      totalCalories += dailyCalories;
+      calorieBreakdown.push({ age, calories: dailyCalories });
+    });
+    
+    return { 
+      totalCalories, 
+      calorieBreakdown, 
+      averagePerPerson: Math.round(totalCalories / ages.length) 
+    };
+  };
+
   const generateMealPlan = async () => {
     setLoading(true);
     try {
@@ -28,49 +61,56 @@ export default function MealPlanner() {
         return;
       }
 
+      // Calculate calorie needs
+      const calorieInfo = calculateCalorieNeeds();
+      const mealsPerDay = mealsToInclude.length;
+      const caloriesPerMeal = Math.round(calorieInfo.totalCalories / mealsPerDay);
+
       const prompt = `Create a healthy 7-day meal plan for a family of ${formData.familySize} people (ages: ${formData.ages}). 
       Dietary preference: ${formData.dietary === 'none' ? 'No restrictions' : formData.dietary}.
-      ${formData.dietary === 'simple-cooking' ? 'IMPORTANT: All meals must have 15 minutes or less prep time. Focus on quick recipes like salads, sandwiches, wraps, smoothie bowls, one-pot meals, quick stir-fries, and minimal-prep dishes. Avoid recipes requiring marinating, long cooking times, or complex techniques.' : ''}
-      ${formData.dietary === 'no-fish' ? 'IMPORTANT: Do not include any fish or seafood in the meal plan.' : ''}
+      ${formData.dietary === 'simple-cooking' ? 'IMPORTANT: All meals must have 15 minutes or less prep time. Focus on quick recipes like salads, sandwiches, wraps, smoothie bowls, one-pot meals, quick stir-fries, and minimal-prep dishes.' : ''}
+      ${formData.dietary === 'no-fish' ? 'IMPORTANT: Do not include any fish or seafood.' : ''}
       ${formData.dietary === 'no-red-meat' ? 'IMPORTANT: Do not include beef, pork, lamb, or other red meats. Chicken, turkey, fish, and plant-based proteins are fine.' : ''}
+      
+      CALORIC REQUIREMENTS:
+      - Total daily caloric need for the family: ${calorieInfo.totalCalories} calories
+      - Average per person: ${calorieInfo.averagePerPerson} calories/day
+      - Target calories per meal: approximately ${caloriesPerMeal} total calories for the family
+      - Ensure meals are nutritionally balanced and appropriate for ages: ${formData.ages}
+      - Consider portion sizes appropriate for different ages (smaller portions for children, larger for teenagers/adults)
       
       Include only these meals: ${mealsToInclude.join(', ')}.
       
-      IMPORTANT: Include diverse ethnic cuisines throughout the week. Draw from Chinese, Indian, Thai, Japanese, Korean, Mexican, Mediterranean, Middle Eastern, Vietnamese, and other global cuisines. Ensure variety across the 7 days - don't repeat the same cuisine type more than twice in the week.
+      IMPORTANT: Include diverse ethnic cuisines throughout the week. Draw from Chinese, Indian, Thai, Japanese, Korean, Mexican, Mediterranean, Middle Eastern, Vietnamese, and other global cuisines.
       
       For each day (Monday-Sunday), provide for each included meal type:
-      1. Meal name (include the cuisine type, e.g., "Thai Green Curry", "Indian Butter Chicken")
+      1. Meal name (include cuisine type)
       2. Brief description (1-2 sentences)
-      3. Preparation time in minutes (realistic estimate)
-      4. A specific, real recipe URL from reputable cooking websites. Use diverse sources including:
-         - General: AllRecipes, Bon Appetit, Serious Eats, NYT Cooking
-         - Asian: The Woks of Life, Just One Cookbook, Hebbar's Kitchen, Hot Thai Kitchen
-         - Mexican/Latin: Serious Eats, Rick Bayless, Pati's Mexican Table
-         - Middle Eastern/Mediterranean: Ottolenghi, Maureen Abood
-         - Multi-cultural: BBC Good Food, Epicurious
-      5. Key ingredients
+      3. Preparation time in minutes
+      4. Estimated calories per serving
+      5. A specific recipe URL from reputable cooking websites
+      6. Key ingredients
       
-      At the end, provide a consolidated grocery list organized by category (Proteins, Vegetables, Fruits, Grains, Dairy, Pantry, Spices & Aromatics).
-      IMPORTANT: Include specific quantities for each ingredient based on the family size of ${formData.familySize} people.
+      At the end, provide a consolidated grocery list organized by category (Proteins, Vegetables, Fruits, Grains, Dairy, Pantry, Spices & Aromatics) with specific quantities for ${formData.familySize} people.
       
-      Respond ONLY with valid JSON (no markdown formatting, no preamble). Use this exact structure:
+      Respond ONLY with valid JSON (no markdown). Use this exact structure:
       {
         "days": [
           {
             "day": "Monday",
             "meals": {
-              ${mealsToInclude.map(meal => `"${meal}": {"name": "...", "description": "...", "prepTime": 30, "recipeUrl": "https://...", "ingredients": ["...", "..."]}`).join(',\n              ')}
+              ${mealsToInclude.map(meal => `"${meal}": {"name": "...", "description": "...", "prepTime": 30, "calories": 500, "recipeUrl": "https://...", "ingredients": ["...", "..."]}`).join(',\n              ')}
             }
           }
         ],
         "groceryList": {
-          "Proteins": ["2 lbs chicken breast", "1 lb ground beef"],
-          "Vegetables": ["3 large tomatoes", "2 bell peppers"],
-          "Fruits": ["6 bananas", "2 lbs apples"],
-          "Grains": ["1 box pasta (16 oz)", "2 lbs rice"],
-          "Dairy": ["1 gallon milk", "8 oz cheddar cheese"],
-          "Spices & Aromatics": ["1 bunch cilantro", "2 inch ginger root", "6 cloves garlic"],
-          "Pantry": ["1 bottle olive oil", "salt and pepper", "soy sauce"]
+          "Proteins": ["2 lbs chicken breast"],
+          "Vegetables": ["3 large tomatoes"],
+          "Fruits": ["6 bananas"],
+          "Grains": ["1 box pasta (16 oz)"],
+          "Dairy": ["1 gallon milk"],
+          "Spices & Aromatics": ["1 bunch cilantro"],
+          "Pantry": ["1 bottle olive oil"]
         }
       }`;
 
@@ -93,8 +133,6 @@ export default function MealPlanner() {
       }
 
       const data = await response.json();
-      console.log('API Response:', data);
-      
       const content = data.candidates[0].content.parts[0].text;
       
       let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -103,7 +141,7 @@ export default function MealPlanner() {
       setMealPlan(planData);
     } catch (error) {
       console.error('Error generating meal plan:', error);
-      alert('Failed to generate meal plan. Please try again. Error: ' + error.message);
+      alert('Failed to generate meal plan. Please try again.');
     }
     setLoading(false);
   };
@@ -111,12 +149,20 @@ export default function MealPlanner() {
   const exportToText = () => {
     let textContent = `WEEKLY MEAL PLAN\nGenerated: ${new Date().toLocaleDateString()}\n\n`;
     
+    const calorieInfo = calculateCalorieNeeds();
+    textContent += `CALORIE TARGETS:\n`;
+    textContent += `Total family daily needs: ${calorieInfo.totalCalories} calories\n`;
+    textContent += `Average per person: ${calorieInfo.averagePerPerson} calories/day\n\n`;
+    
     mealPlan.days.forEach(day => {
       textContent += `${day.day.toUpperCase()}\n${'='.repeat(day.day.length)}\n`;
       Object.entries(day.meals).forEach(([mealType, meal]) => {
         textContent += `\n${mealType.toUpperCase()}: ${meal.name}\n`;
         textContent += `Description: ${meal.description}\n`;
         textContent += `Prep time: ${meal.prepTime} minutes\n`;
+        if (meal.calories) {
+          textContent += `Calories per serving: ${meal.calories}\n`;
+        }
         if (meal.recipeUrl) {
           textContent += `Recipe: ${meal.recipeUrl}\n`;
         }
@@ -169,7 +215,8 @@ export default function MealPlanner() {
         icsContent += `DTSTART:${startStr}\n`;
         icsContent += `DTEND:${endStr}\n`;
         icsContent += `SUMMARY:${mealType.charAt(0).toUpperCase() + mealType.slice(1)}: ${meal.name}\n`;
-        icsContent += `DESCRIPTION:Prep time: ${meal.prepTime} min\\n${meal.recipeUrl || ''}\n`;
+        const calorieText = meal.calories ? `Calories: ${meal.calories}\\n` : '';
+        icsContent += `DESCRIPTION:Prep: ${meal.prepTime} min\\n${calorieText}${meal.recipeUrl || ''}\n`;
         icsContent += `END:VEVENT\n`;
       });
     });
@@ -343,10 +390,15 @@ export default function MealPlanner() {
                           <p className="font-medium text-gray-900 mb-2">{meal.name}</p>
                           <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
                           
-                          <div className="flex items-center gap-2 mb-3 text-sm">
+                          <div className="flex items-center gap-2 mb-3 text-sm flex-wrap">
                             <span className="bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
                               ⏱️ {meal.prepTime} min
                             </span>
+                            {meal.calories && (
+                              <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded font-medium">
+                                🔥 {meal.calories} cal
+                              </span>
+                            )}
                           </div>
                           
                           {meal.recipeUrl && (
