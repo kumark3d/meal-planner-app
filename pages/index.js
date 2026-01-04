@@ -38,7 +38,9 @@ export default function MealPlanner() {
 
       const prompt = `Create a healthy 7-day meal plan for a family of ${formData.familySize} people (ages: ${formData.ages}). 
       Dietary preference: ${formData.dietary === 'none' ? 'No restrictions' : formData.dietary}.
-      
+      ${formData.dietary === 'simple-cooking' ? 'IMPORTANT: All meals must have 15 minutes or less prep time. Focus on quick recipes like salads, sandwiches, wraps, smoothie bowls, one-pot meals, quick stir-fries, and minimal-prep dishes. Avoid recipes requiring marinating, long cooking times, or complex techniques.' : ''}
+      ${formData.dietary === 'no-fish' ? 'IMPORTANT: Do not include any fish or seafood in the meal plan.' : ''}
+      ${formData.dietary === 'no-red-meat' ? 'IMPORTANT: Do not include beef, pork, lamb, or other red meats. Chicken, turkey, fish, and plant-based proteins are fine.' : ''}
       Include only these meals: ${mealsToInclude.join(', ')}.
       
       IMPORTANT: Include diverse ethnic cuisines throughout the week. Draw from Chinese, Indian, Thai, Japanese, Korean, Mexican, Mediterranean, Middle Eastern, Vietnamese, and other global cuisines. Ensure variety across the 7 days - don't repeat the same cuisine type more than twice in the week.
@@ -49,7 +51,7 @@ export default function MealPlanner() {
       3. Preparation time in minutes (realistic estimate)
       4. A specific, real recipe URL from reputable cooking websites. Use diverse sources including:
          - General: AllRecipes, Bon Appetit, Serious Eats, NYT Cooking
-         - Asian: The Woks of Life, Just One Cookbook, Hebbar's Kitchen, Hot Thai Kitchen
+         - Asian: The Woks of Life, Just One Cookbook, Hebbar's Kitchen, Hot Thai Kitchen, Rak's Kitchen
          - Mexican/Latin: Serious Eats, Rick Bayless, Pati's Mexican Table
          - Middle Eastern/Mediterranean: Ottolenghi, Maureen Abood
          - Multi-cultural: BBC Good Food, Epicurious
