@@ -208,7 +208,9 @@ export default function MealPlanner() {
                 <option value="gluten-free">Gluten-free</option>
                 <option value="dairy-free">Dairy-free</option>
                 <option value="low-carb">Low-carb</option>
+                <option value="simple-cooking">Simple Cooking (under 15 min prep)</option>
                 <option value="keto">Keto</option>
+                <option value="no-fish">No Fish</option>
               </select>
             </div>
 
